@@ -1,5 +1,5 @@
 {
-  "name": "angular-tailwindcss-schematics",
+  "name": "@ngx/tailwindcss",
   "version": "0.0.1",
   "description": "Simple Angular Schematic to add tailwindcss to any Angular application",
   "scripts": {
