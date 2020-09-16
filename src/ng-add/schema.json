@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "id": "tailwind-schematic-ng-add",
+    "title": "Add Tailwind to Angular application",
+    "description": "Add Tailwind to Angular application",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The name of the person",
+            "$default": {
+                "$source": "argv",
+                "index": 0
+            },
+            "x-prompt": "Who do you want to greet?"
+        }
+    },
+    "required": [
+        "name"
+    ]
+}
