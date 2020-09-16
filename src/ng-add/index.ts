@@ -33,6 +33,9 @@ export default function (options: Schema): Rule {
     const projectName = options.project as string;
     // select project from projects array in `angular.json` file
     const project: workspace.WorkspaceProject = workspaceConfig.projects[projectName];
+    if (!project) {
+      throw new SchematicsException(`Project ${projectName} is not defined in this workspace.`);
+    }
     const projectType = project.projectType === 'application' ? 'app' : 'lib';
     // Path to create the file
     const defaultPath = `${project.sourceRoot}/${projectType}`;

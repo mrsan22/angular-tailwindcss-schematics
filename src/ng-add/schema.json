@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/schema",
     "id": "tailwind-schematic-ng-add",
-    "title": "Add Tailwind to Angular application",
-    "description": "Add Tailwind to Angular application",
+    "title": "Add TailwindCSS to Angular application",
+    "description": "Standalone schematic to add TailwindCSS to Angular application",
     "type": "object",
     "properties": {
         "name": {
