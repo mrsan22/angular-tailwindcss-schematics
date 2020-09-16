@@ -1,7 +1,10 @@
-import { strings } from '@angular-devkit/core';
+import { normalize, strings } from '@angular-devkit/core';
+import { workspace } from '@angular-devkit/core/src/experimental';
 import {
   apply,
+  chain,
   mergeWith,
+  move,
   Rule,
   SchematicContext,
   SchematicsException,
@@ -12,13 +15,28 @@ import {
 import { Schema } from './schema';
 
 /** Rule factory: returns a rule (function) */
-export default function (options: Schema): Rule {
-  // this is a rule. It takes a `tree` and returns updated `tree`.
-  return (tree: Tree, _context: SchematicContext) => {
-    if (!options.name) {
-      throw new SchematicsException('name option is required.');
-    }
+export default function (options: Schema): Rule | any {
+  // this is a rule (function). It takes a `tree` and returns updated `tree`.
+  return async (tree: Tree, _context: SchematicContext) => {
     console.log('schematic works', options);
+    // Read `angular.json` as buffer
+    const workspaceConfigBuffer = tree.read('angular.json');
+    if (!workspaceConfigBuffer) {
+      throw new SchematicsException('Could not find an Angular workspace configuration');
+    }
+    // parse config only when not null
+    const workspaceConfig: workspace.WorkspaceSchema = JSON.parse(workspaceConfigBuffer.toString());
+    // if project is not passed (--project), use default project name
+    if (!options.project && workspaceConfig.defaultProject) {
+      options.project = workspaceConfig.defaultProject;
+    }
+    const projectName = options.project as string;
+    // select project from projects array in `angular.json` file
+    const project: workspace.WorkspaceProject = workspaceConfig.projects[projectName];
+    const projectType = project.projectType === 'application' ? 'app' : 'lib';
+    // Path to create the file
+    const defaultPath = `${project.sourceRoot}/${projectType}`;
+
     // get hold of our templates files
     const sourceTemplates = url('./files');
     /**
@@ -29,10 +47,13 @@ export default function (options: Schema): Rule {
       template({
         ...options,
         ...strings,
+        name: options.name,
       }),
+      // move file to resolved path
+      move(normalize(defaultPath as string)),
     ]);
     // mergeWith returns a Rule so it can be called with tree and context (not required though)
     // merge our template into tree.
-    return mergeWith(sourceParamteterizedTemplates)(tree, _context);
+    return chain([mergeWith(sourceParamteterizedTemplates)]);
   };
 }

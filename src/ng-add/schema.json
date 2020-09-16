@@ -7,15 +7,20 @@
     "properties": {
         "name": {
             "type": "string",
-            "description": "The name of the file",
+            "description": "The name of the person.",
             "$default": {
                 "$source": "argv",
                 "index": 0
             },
-            "x-prompt": "Enter file postfix?"
+            "x-prompt": "Who you want to greet?"
+        },
+        "project": {
+            "type": "string",
+            "description": "The name of the project where we want to add files.",
+            "$default": {
+                "$source": "projectName"
+            }
         }
     },
-    "required": [
-        "name"
-    ]
+    "required": []
 }
