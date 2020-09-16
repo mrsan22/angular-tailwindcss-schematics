@@ -1,5 +1,5 @@
 {
-  "name": "@ngx/tailwindcss",
+  "name": "@ngx/tailwindcss-schematic",
   "version": "0.0.1",
   "description": "Simple Angular Schematic to add tailwindcss to any Angular application",
   "scripts": {
@@ -8,7 +8,9 @@
     "test": "npm run build && jasmine src/**/*_spec.js"
   },
   "keywords": [
-    "schematics"
+    "angular",
+    "schematics",
+    "tailwindcss"
   ],
   "author": "",
   "license": "MIT",
