@@ -15,7 +15,7 @@ import {
 import { Schema } from './schema';
 
 /** Rule factory: returns a rule (function) */
-export default function (options: Schema): Rule | any {
+export default function (options: Schema): Rule {
   // this is a rule (function). It takes a `tree` and returns updated `tree`.
   return async (tree: Tree, _context: SchematicContext) => {
     console.log('schematic works', options);
