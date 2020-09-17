@@ -12,9 +12,14 @@ import {
   Tree,
   url,
 } from '@angular-devkit/schematics';
-import { addPackageJsonDependency, NodeDependency, NodeDependencyType } from '@schematics/angular/utility/dependencies';
+import { addPackageJsonDependency, NodeDependency } from '@schematics/angular/utility/dependencies';
 import { Schema } from './schema';
-import { tailwindcssDependencies } from './utils';
+import {
+  getProjectDefaultStyleFile,
+  getTailwindCSSImports,
+  nodeDependencyFactory,
+  tailwindcssDependencies,
+} from './utils';
 
 /** Rule factory: returns a rule (function) */
 export default function (options: Schema): Rule {
@@ -42,7 +47,10 @@ export default function (options: Schema): Rule {
     // Path to create the file
     // const defaultPath = `${project.sourceRoot}/${projectType}`;
     // compose all rules using chain Rule.
-    return chain([addDependencies(options), addTemplateFiles(options)])(tree, context);
+    return chain([addDependencies(options), updateStylesFile(options, project), addTemplateFiles(options)])(
+      tree,
+      context
+    );
   };
 }
 
@@ -96,16 +104,21 @@ function addTemplateFiles(options: Schema): Rule {
   };
 }
 
-function nodeDependencyFactory(dependencyName: string, options: Schema): NodeDependency {
-  // default version : latest
-  let version = 'latest';
-  if (dependencyName === 'tailwindcss' && options.tailwindcssVersion) {
-    version = options.tailwindcssVersion;
-  }
-  return {
-    type: NodeDependencyType.Dev,
-    name: dependencyName,
-    version: version,
-    overwrite: false,
+function updateStylesFile(options: Schema, project: workspace.WorkspaceProject) {
+  return (tree: Tree, context: SchematicContext) => {
+    const stylePath = getProjectDefaultStyleFile(project, options.cssType);
+    if (!stylePath) {
+      context.logger.error(`Cannot update project styles file: Default style file path not found`);
+      return tree;
+    }
+    const recorder = tree.beginUpdate(stylePath);
+    recorder.insertLeft(0, getTailwindCSSImports());
+    tree.commitUpdate(recorder);
+    return tree;
   };
 }
+
+// function updateAngularJsonFile(options: Schema){
+//   return (tree: Tree, context: SchematicContext) => {
+//   }
+// }
