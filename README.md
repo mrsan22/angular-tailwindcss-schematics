@@ -28,10 +28,10 @@ You can pass additional options while installing this schematic.
   ng add @ngx/tailwindcss-schematic --tw 1.8.7
   ```
 
-| Options            | Alias | Default                           | Type   | Required | Description                                         |
-| ------------------ | ----- | --------------------------------- | ------ | -------- | --------------------------------------------------- |
-| project            | p     | `defaultProject` in the workspace | string | **NO**   | The name of the project where we want to add files. |
-| tailwindcssVersion | tw    | latest                            | string | **NO**   | Specific Tailwind CSS version to be installed.      |
+| Options            | Alias  | Default                           | Type   | Required | Description                                         |
+| ------------------ | ------ | --------------------------------- | ------ | -------- | --------------------------------------------------- |
+| project            | `--p`  | `defaultProject` in the workspace | string | No       | The name of the project where we want to add files. |
+| tailwindcssVersion | `--tw` | latest                            | string | No       | Specific Tailwind CSS version to be installed.      |
 
 ---
 
