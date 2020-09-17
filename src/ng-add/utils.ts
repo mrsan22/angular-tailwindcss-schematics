@@ -27,9 +27,9 @@ export function nodeDependencyFactory(dependencyName: string, options: Schema): 
 
 export function getTailwindCSSImports(): string {
   return `
-      @import 'tailwindcss/base';
-      @import 'tailwindcss/components';
-      @import 'tailwindcss/utilities';
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 `;
 }
 
@@ -41,12 +41,19 @@ export function getProjectDefaultStyleFile(project: workspace.WorkspaceProject, 
         ? `${project.sourceRoot}/styles.${fileExtension}`
         : null
     );
-    console.log('defaultMainStylePath', defaultMainStylePath);
     if (defaultMainStylePath && defaultMainStylePath[0]) {
       return normalize(defaultMainStylePath[0]);
     }
   }
   return null;
+}
+
+/** Gets all targets from the given project that match the specified builder name. */
+export function getTargetsByBuilderName(project: workspace.WorkspaceProject, builderName: string) {
+  const targets = project.architect || {};
+  return Object.keys(targets)
+    .filter((name) => targets[name].builder === builderName)
+    .map((name) => targets[name]);
 }
 
 function getProjectTargetOptions(project: workspace.WorkspaceProject, target: string) {

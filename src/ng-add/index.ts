@@ -12,11 +12,14 @@ import {
   Tree,
   url,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { addPackageJsonDependency, NodeDependency } from '@schematics/angular/utility/dependencies';
+import { Builders } from '@schematics/angular/utility/workspace-models';
 import { Schema } from './schema';
 import {
   getProjectDefaultStyleFile,
   getTailwindCSSImports,
+  getTargetsByBuilderName,
   nodeDependencyFactory,
   tailwindcssDependencies,
 } from './utils';
@@ -25,7 +28,6 @@ import {
 export default function (options: Schema): Rule {
   // this is a rule (function). It takes a `tree` and returns updated `tree`.
   return (tree: Tree, context: SchematicContext) => {
-    console.log('schematic works', options);
     // Read `angular.json` as buffer
     const workspaceConfigBuffer = tree.read('angular.json');
     if (!workspaceConfigBuffer) {
@@ -33,24 +35,24 @@ export default function (options: Schema): Rule {
     }
     // parse config only when not null
     const workspaceConfig: workspace.WorkspaceSchema = JSON.parse(workspaceConfigBuffer.toString());
-    // // if project is not passed (--project), use default project name
+    // if project is not passed (--project), use default project name
     if (!options.project && workspaceConfig.defaultProject) {
       options.project = workspaceConfig.defaultProject;
     }
     const projectName = options.project as string;
-    // // select project from projects array in `angular.json` file
+    // elect project from projects array in `angular.json` file
     const project: workspace.WorkspaceProject = workspaceConfig.projects[projectName];
     if (!project) {
       throw new SchematicsException(`Project ${projectName} is not defined in this workspace.`);
     }
-    // const projectType = project.projectType === 'application' ? 'app' : 'lib';
-    // Path to create the file
-    // const defaultPath = `${project.sourceRoot}/${projectType}`;
     // compose all rules using chain Rule.
-    return chain([addDependencies(options), updateStylesFile(options, project), addTemplateFiles(options)])(
-      tree,
-      context
-    );
+    return chain([
+      addDependencies(options),
+      updateStylesFile(options, project),
+      addTemplateFiles(options),
+      updateAngularJsonFile(workspaceConfig, project),
+      install(),
+    ])(tree, context);
   };
 }
 
@@ -72,17 +74,21 @@ function addDependencies(options: Schema): Rule {
     });
   };
 }
-
-// Install dependencies
-// function install(): Rule {
-//   return (tree: Tree, context: SchematicContext) => {
-//     // Install the dependency
-//     context.addTask(new NodePackageInstallTask());
-//     context.logger.info('✅️ Installed dependencies');
-//     return tree;
-//   };
-// }
-
+/** Update default project styles file */
+function updateStylesFile(options: Schema, project: workspace.WorkspaceProject) {
+  return (tree: Tree, context: SchematicContext) => {
+    const stylePath = getProjectDefaultStyleFile(project, options.cssType);
+    if (!stylePath) {
+      context.logger.error(`Cannot update project styles file: Default style file path not found`);
+      return tree;
+    }
+    const recorder = tree.beginUpdate(stylePath);
+    recorder.insertLeft(0, getTailwindCSSImports());
+    tree.commitUpdate(recorder);
+    return tree;
+  };
+}
+/** Add schematic templates from `./files` to the target application */
 function addTemplateFiles(options: Schema): Rule {
   return (tree: Tree, context: SchematicContext) => {
     // get hold of our templates files
@@ -103,22 +109,35 @@ function addTemplateFiles(options: Schema): Rule {
     return mergeWith(sourceParamteterizedTemplates)(tree, context);
   };
 }
-
-function updateStylesFile(options: Schema, project: workspace.WorkspaceProject) {
-  return (tree: Tree, context: SchematicContext) => {
-    const stylePath = getProjectDefaultStyleFile(project, options.cssType);
-    if (!stylePath) {
-      context.logger.error(`Cannot update project styles file: Default style file path not found`);
-      return tree;
+/** Update `angular.json` file in Angular CLI workspace */
+function updateAngularJsonFile(workspaceConfig: workspace.WorkspaceSchema, project: workspace.WorkspaceProject) {
+  return (tree: Tree, _context: SchematicContext) => {
+    const browserTargets = getTargetsByBuilderName(project, Builders.Browser);
+    const devServerTargets = getTargetsByBuilderName(project, Builders.DevServer);
+    // Multi app support
+    for (const devServerTarget of devServerTargets) {
+      devServerTarget.builder = '@angular-builders/custom-webpack:dev-server';
     }
-    const recorder = tree.beginUpdate(stylePath);
-    recorder.insertLeft(0, getTailwindCSSImports());
-    tree.commitUpdate(recorder);
-    return tree;
+
+    for (const browserTarget of browserTargets) {
+      browserTarget.builder = '@angular-builders/custom-webpack:browser';
+      browserTarget.options = {
+        customWebpackConfig: {
+          path: './webpack.config.js',
+        },
+        ...(browserTarget.options as any),
+      };
+    }
+
+    tree.overwrite('angular.json', JSON.stringify(workspaceConfig, null, 2));
   };
 }
 
-// function updateAngularJsonFile(options: Schema){
-//   return (tree: Tree, context: SchematicContext) => {
-//   }
-// }
+/** Install Node dependencies */
+function install(): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    // Install the dependency
+    context.addTask(new NodePackageInstallTask());
+    return tree;
+  };
+}
