@@ -3,6 +3,9 @@ src/**/*.js
 src/**/*.js.map
 src/**/*.d.ts
 
+# do not ignore files dir
+!src/*/files/**/*
+
 # IDEs
 .idea/
 jsconfig.json

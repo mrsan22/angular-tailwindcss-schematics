@@ -69,7 +69,7 @@ function addDependencies(options: Schema): Rule {
     deps.map((dependencyName: string) => {
       const nodeDependency: NodeDependency = nodeDependencyFactory(dependencyName, options);
       addPackageJsonDependency(tree, nodeDependency);
-      context.logger.info(`✅️ Added ${nodeDependency.name}@${nodeDependency.version} to ${nodeDependency.type}`);
+      context.logger.info(`➡️ Added ${nodeDependency.name}@${nodeDependency.version} to ${nodeDependency.type}`);
       return tree;
     });
   };
