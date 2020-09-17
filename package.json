@@ -12,7 +12,7 @@
     "schematics",
     "tailwindcss"
   ],
-  "author": "",
+  "author": "sanjiv kumar",
   "license": "MIT",
   "schematics": "./src/collection.json",
   "dependencies": {
