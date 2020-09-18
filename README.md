@@ -1,5 +1,7 @@
 # Angular Tailwind CSS Schematics
 
+![npm](https://img.shields.io/npm/v/ngx-tailwindcss-schematic)
+
 A simple standalone angular schematics to add [tailwindcss](https://tailwindcss.com/) to your angular cli project.
 
 ## Installation
