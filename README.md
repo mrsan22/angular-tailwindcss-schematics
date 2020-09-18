@@ -122,9 +122,13 @@ You can also test using the `ng add` or `nx add` (in Nx workspace) command while
 3. Run `npm i --no-save ngx-tailwindcss-schematic-1.0.0-tgz`
 4. Run `ng add @ngx/tailwindcss-schematic`
 
-## Unit Testing (TODO)
+## Unit Testing (Todo)
 
 `npm run test` will run the unit tests, using Jasmine as a runner and test framework.
+
+## Learning
+
+Detailed blog on my learning coming soon!
 
 ## Credits
 
