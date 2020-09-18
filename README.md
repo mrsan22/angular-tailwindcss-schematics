@@ -7,13 +7,13 @@ A simple standalone angular schematics to add [tailwindcss](https://tailwindcss.
 - [Angular CLI](https://angular.io/cli) workspace
 
   ```javascript
-  ng add @ngx/tailwindcss-schematic
+  ng add ngx-tailwindcss-schematic
   ```
 
 - [Nx](https://nx.dev/angular) workspace
 
   ```javascript
-  nx add @ngx/tailwindcss-schematic
+  nx add ngx-tailwindcss-schematic
   ```
 
   - In Nx, you can also use `ng add`
@@ -25,7 +25,7 @@ You can pass additional options while installing this schematic.
 - For e.g., Installing a specific version of `tailwindcss`
 
   ```javascript
-  ng add @ngx/tailwindcss-schematic --tw 1.8.7
+  ng add ngx-tailwindcss-schematic --tw 1.8.7
   ```
 
 | Options            | Alias | Default                           | Type   | Required | Description                                         |
@@ -66,7 +66,7 @@ As mentioned before you can provide the custom version for `tailwindcss` using t
 ## Expected Output
 
 ```javascript
-  ng add @ngx/tailwindcss-schematic --tw 1.8.7
+  ng add ngx-tailwindcss-schematic --tw 1.8.7
 ```
 
 ```javascript
@@ -120,7 +120,7 @@ You can also test using the `ng add` or `nx add` (in Nx workspace) command while
 1. Build the schematic: `npm run build`
 2. Run `npm pack`. This will produce a `ngx-tailwindcss-schematic-1.0.0-tgz` file of your schematic. Copy this file to any Angular workspace where you want to test the schematic.
 3. Run `npm i --no-save ngx-tailwindcss-schematic-1.0.0-tgz`
-4. Run `ng add @ngx/tailwindcss-schematic`
+4. Run `ng add ngx-tailwindcss-schematic`
 
 ## Unit Testing (Todo)
 
